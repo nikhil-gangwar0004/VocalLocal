@@ -1,6 +1,7 @@
 // src/services/api.js
 
-const BASE_URL = 'http://localhost:5000/api';
+// 🔴 LOCALHOST KI JAGAH RENDER WALA LINK DAAL DIYA HAI
+const BASE_URL = 'https://vocallocal-lrje.onrender.com/api';
 
 // ─── TOKEN HELPERS ─── (localStorage use karo — App.js ke saath consistent)
 const getToken = () => {
