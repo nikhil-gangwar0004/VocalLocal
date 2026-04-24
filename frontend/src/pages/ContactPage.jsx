@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, CheckCircle, MessageCircle, Clock, Globe } from 'lucide-react';
+// ✅ Globe icon hata diya kyunki use nahi ho raha tha
+import { Mail, Phone, MapPin, Send, CheckCircle, MessageCircle, Clock } from 'lucide-react';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },

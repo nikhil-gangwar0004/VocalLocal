@@ -12,7 +12,12 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // React frontend
+  origin: [
+    'http://localhost:3000',
+    'https://vocal-local.vercel.app',
+    'https://vocal-local-git-main-nikhils-projects-1c4bdb3d.vercel.app',
+    'https://vocal-local-5uykmqpu4-nikhils-projects-1c4bdb3d.vercel.app'
+  ],
   credentials: true
 }));
 app.use(express.json());

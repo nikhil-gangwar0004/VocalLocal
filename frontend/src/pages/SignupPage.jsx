@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+// ✅ AnimatePresence icon hata diya
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, Phone } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { registerUser } from '../services/api';
@@ -12,7 +13,6 @@ const SignupPage = ({ onLogin }) => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // ✅ Validation
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePhone = (phone) => /^[6-9]\d{9}$/.test(phone);
 

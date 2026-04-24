@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, MapPin, Star, Filter } from 'lucide-react';
+import { Search, MapPin, Star } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom'; // ✅ Added useLocation
 import { getProfessionals } from '../services/api';
 
