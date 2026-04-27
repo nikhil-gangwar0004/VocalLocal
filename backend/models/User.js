@@ -24,7 +24,6 @@ const userSchema = new mongoose.Schema({
     default: 'customer' 
   },
   isVerifiedPro: { type: Boolean, default: false },
-  // ✅ isVerified ko default true kar diya taaki OTP ki zaroorat na pade
   isVerified: { type: Boolean, default: true }, 
   proDetails: {
     category: String,
@@ -37,6 +36,11 @@ const userSchema = new mongoose.Schema({
     status: { type: String, default: 'none' } 
   },
   avatar: { type: String, default: '' },
+
+  // ✅ Forget Password OTP fields
+  resetOtp: { type: String, default: null },
+  resetOtpExpiry: { type: Date, default: null },
+
   createdAt: { type: Date, default: Date.now },
 });
 

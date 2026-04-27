@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const professionalSchema = new mongoose.Schema({
   name: { type: String, required: true },
   role: { type: String, required: true }, // Plumber, Electrician, etc.
+  email: { type: String, default: '' }, // ✅ Added — booking notification ke liye
   rating: { type: Number, default: 0 },
   totalRatings: { type: Number, default: 0 },
   jobs: { type: Number, default: 0 },

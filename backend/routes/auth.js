@@ -1,15 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const User = require('../models/User');
 const Professional = require('../models/Professional');
 const { protect } = require('../middleware/authMiddleware');
+const { sendOtpEmail } = require('../utils/sendEmail');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
 
-// POST /api/auth/register (Direct - No OTP)
+// POST /api/auth/register
 router.post('/register', async (req, res) => {
     try {
         const { name, email, password, phone, role } = req.body;
@@ -19,7 +21,7 @@ router.post('/register', async (req, res) => {
         const user = await User.create({
             name, email, password, phone,
             role: role || 'customer',
-            isVerified: true 
+            isVerified: true
         });
 
         res.status(201).json({
@@ -46,14 +48,54 @@ router.post('/login', async (req, res) => {
     } catch (error) { res.status(500).json({ message: error.message }); }
 });
 
-// ✅ FORGOT PASSWORD (Using placeholder for logic)
+// ✅ 1️⃣ FORGOT PASSWORD — OTP Send
 router.post('/forgot-password', async (req, res) => {
     try {
         const { email } = req.body;
         const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ message: 'User nahi mila' });
-        // Yahan tu future mein simple reset link ya direct logic daal sakta hai
-        res.json({ message: 'Reset instruction sent!' });
+        if (!user) return res.status(404).json({ message: 'Ye email registered nahi hai' });
+
+        const otp = crypto.randomInt(100000, 999999).toString();
+        user.resetOtp = otp;
+        user.resetOtpExpiry = Date.now() + 10 * 60 * 1000;
+        await user.save();
+
+        await sendOtpEmail(email, otp);
+        res.json({ message: 'OTP bhej diya gaya!' });
+    } catch (error) { res.status(500).json({ message: error.message }); }
+});
+
+// ✅ 2️⃣ VERIFY OTP
+router.post('/verify-otp', async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user || user.resetOtp !== otp)
+            return res.status(400).json({ message: 'Invalid OTP' });
+
+        if (user.resetOtpExpiry < Date.now())
+            return res.status(400).json({ message: 'OTP expire ho gaya, dobara try karo' });
+
+        res.json({ message: 'OTP verified!', success: true });
+    } catch (error) { res.status(500).json({ message: error.message }); }
+});
+
+// ✅ 3️⃣ RESET PASSWORD
+router.post('/reset-password', async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user || user.resetOtp !== otp || user.resetOtpExpiry < Date.now())
+            return res.status(400).json({ message: 'Invalid ya expired OTP' });
+
+        user.password = newPassword;
+        user.resetOtp = null;
+        user.resetOtpExpiry = null;
+        await user.save();
+
+        res.json({ message: 'Password reset ho gaya! 🎉' });
     } catch (error) { res.status(500).json({ message: error.message }); }
 });
 
@@ -117,10 +159,12 @@ router.put('/admin/approve-pro/:id', protect, async (req, res) => {
         user.isVerifiedPro = true;
         user.proDetails.status = 'approved';
         await user.save();
+
         const alreadyExists = await Professional.findOne({ name: user.name });
         if (!alreadyExists) {
             await Professional.create({
                 name: user.name,
+                email: user.email,
                 role: user.proDetails?.category || 'Handyman',
                 phone: user.phone || '',
                 price: user.proDetails?.price || '₹299/hr',
@@ -129,6 +173,11 @@ router.put('/admin/approve-pro/:id', protect, async (req, res) => {
                 available: true, verified: true, color: '#22c55e',
                 skills: [user.proDetails?.category || 'General'],
                 bio: `Verified professional on VocalLocal`,
+            });
+        } else {
+            // ✅ FIX — email update karo agar professional pehle se exist karta hai
+            await Professional.findByIdAndUpdate(alreadyExists._id, {
+                email: user.email
             });
         }
         res.json({ message: `${user.name} approved!` });

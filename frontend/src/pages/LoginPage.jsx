@@ -101,7 +101,7 @@ const LoginPage = ({ onLogin }) => {
             </div>
 
             {/* Password */}
-            <div style={{ marginBottom: 20 }}>
+            <div style={{ marginBottom: 8 }}>
               <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#64748b', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Password</label>
               <div style={{ position: 'relative' }}>
                 <Lock size={16} color="#334155" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
@@ -114,6 +114,13 @@ const LoginPage = ({ onLogin }) => {
                   {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+            </div>
+
+            {/* ✅ Forgot Password Link */}
+            <div style={{ textAlign: 'right', marginBottom: 20 }}>
+              <Link to="/forgot-password" style={{ color: '#fbbf24', fontSize: 13, fontWeight: 600, textDecoration: 'none' }}>
+                Forgot Password?
+              </Link>
             </div>
 
             {error && (

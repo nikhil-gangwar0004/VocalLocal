@@ -17,12 +17,12 @@ import NotFoundPage from './pages/NotFoundPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ProfessionalOnboarding from './pages/ProfessionalOnboarding';
 import ProfessionalDashboard from './pages/ProfessionalDashboard';
+import ForgotPassword from './pages/ForgotPassword'; // ✅ Added
 import './output.css';
 
 function App() {
   const [loading, setLoading] = useState(true);
 
-  // ✅ localStorage use karo (api.js ke saath consistent)
   const [user, setUser] = useState(() => {
     try {
       const token = localStorage.getItem('token');
@@ -106,6 +106,12 @@ function App() {
                 <Route
                   path="/signup"
                   element={user ? <Navigate to="/" /> : <SignupPage onLogin={handleLogin} />}
+                />
+
+                {/* ✅ Forgot Password Route */}
+                <Route
+                  path="/forgot-password"
+                  element={user ? <Navigate to="/" /> : <ForgotPassword />}
                 />
 
                 {/* Protected Routes */}

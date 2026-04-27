@@ -1,10 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const Booking = require('../models/Booking');
-const { protect, adminOnly } = require('../middleware/authMiddleware'); // ✅ adminOnly add kiya security ke liye
+const Professional = require('../models/Professional');
+const User = require('../models/User');
+const { sendBookingEmail } = require('../utils/sendEmail'); // ✅ Added
+const { protect, adminOnly } = require('../middleware/authMiddleware');
 
 // @route   POST /api/bookings
-// @desc    Naya booking create karo
+// @desc    Naya booking create karo + professional ko email bhejo
 router.post('/', protect, async (req, res) => {
   try {
     const { professional, service, date, time, address, description, price } = req.body;
@@ -23,6 +26,18 @@ router.post('/', protect, async (req, res) => {
     const populatedBooking = await Booking.findById(booking._id)
       .populate('professional', 'name role phone price');
 
+    // ✅ Professional aur Customer fetch karo
+    const professionalData = await Professional.findById(professional);
+    const customerData = await User.findById(req.user._id);
+
+    // ✅ Email bhejo — error aaye toh booking cancel na ho
+    try {
+      await sendBookingEmail(professionalData?.email, customerData, { service, date, time, address, description, price });
+      console.log('✅ Booking notification email bheja gaya!');
+    } catch (emailErr) {
+      console.log('⚠️ Email send nahi hua:', emailErr.message);
+    }
+
     res.status(201).json(populatedBooking);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -30,7 +45,6 @@ router.post('/', protect, async (req, res) => {
 });
 
 // @route   GET /api/bookings/my
-// @desc    Meri saari bookings dekho
 router.get('/my', protect, async (req, res) => {
   try {
     const bookings = await Booking.find({ user: req.user._id })
@@ -43,7 +57,7 @@ router.get('/my', protect, async (req, res) => {
   }
 });
 
-// ✅ REQUIRED FOR ADMIN: Sirf gangwarn411 hi dekh sakega
+// ✅ ADMIN: Saari bookings
 router.get('/all', protect, adminOnly, async (req, res) => {
   try {
     const bookings = await Booking.find({})
@@ -56,7 +70,7 @@ router.get('/all', protect, adminOnly, async (req, res) => {
   }
 });
 
-// ✅ REQUIRED FOR ADMIN: Sirf gangwarn411 hi status badal sakega
+// ✅ ADMIN: Status update
 router.put('/:id/status', protect, adminOnly, async (req, res) => {
   try {
     const { status } = req.body;
@@ -72,7 +86,6 @@ router.put('/:id/status', protect, adminOnly, async (req, res) => {
 });
 
 // @route   GET /api/bookings/:id
-// @desc    Ek booking ki detail dekho
 router.get('/:id', protect, async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id)
@@ -88,7 +101,6 @@ router.get('/:id', protect, async (req, res) => {
 });
 
 // @route   PUT /api/bookings/:id/cancel
-// @desc    Booking cancel karo
 router.put('/:id/cancel', protect, async (req, res) => {
   try {
     const booking = await Booking.findById(req.params.id);
