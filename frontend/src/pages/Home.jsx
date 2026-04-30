@@ -101,7 +101,7 @@ const Home = () => {
     <div style={{ backgroundColor: '#020617', color: '#fff', fontFamily: "'Segoe UI', sans-serif", overflowX: 'hidden' }}>
 
       {/* ─── HERO ─── */}
-      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '120px 24px 80px', textAlign: 'center', position: 'relative' }}>
+      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 'clamp(80px, 12vw, 120px) 24px 80px', textAlign: 'center', position: 'relative' }}>
         <div style={{ position: 'absolute', top: '20%', left: '50%', transform: 'translateX(-50%)', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(251,191,36,0.07) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
         <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}
@@ -111,7 +111,7 @@ const Home = () => {
         </motion.div>
 
         <motion.h1 initial="hidden" animate="visible" variants={fadeUp} custom={1}
-          style={{ fontSize: 'clamp(52px, 10vw, 96px)', fontWeight: 900, lineHeight: 0.88, letterSpacing: '-2px', marginBottom: 24, maxWidth: 800 }}>
+          style={{ fontSize: 'clamp(52px, 10vw, 96px)', fontWeight: 900, lineHeight: 1.0, letterSpacing: '-2px', marginBottom: 24, maxWidth: 800 }}>
           Find Experts<br />
           <span style={{ color: '#fbbf24', fontStyle: 'italic' }}>Fast & Easy.</span>
         </motion.h1>
